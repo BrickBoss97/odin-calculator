@@ -1,102 +1,142 @@
-// Basic calculations
+let firstNumber = "";
+let secondNumber = "";
+let operator = "";
 
-const add = function(a, b) {
-    return a + b;
-}
-  
-const subtract = function(a, b) {
-    return a - b;
-}
+const display = document.querySelector("#display");
+const buttons = document.querySelector("#buttons");
+displayContent("0");
 
-const multiply = function(a, b) {
-    return a * b;
-}
+buttons.addEventListener("click", (event) => {    
+    if (event.target.classList.contains("btn-num")) {
+        (!operator)
+            ? firstNumber = setNumber(firstNumber, event.target.value)
+            : secondNumber = setNumber(secondNumber, event.target.value)
 
-const divide = function(a, b) {
-    return a / b;
-}
+    } else if (event.target.classList.contains("btn-decimal")) {
+        (!operator)
+            ? firstNumber = addDecimal(firstNumber)
+            : secondNumber = addDecimal(secondNumber)       
 
-// Button variables
+    } else if (event.target.classList.contains("btn-operator")) {
+        if (!secondNumber) {
+            (!firstNumber) ? firstNumber = "0" : firstNumber
+            operator = event.target.value;
+            event.target.focus();
+        } else {
+            firstNumber = operate(firstNumber, secondNumber, operator);
+            secondNumber = "";
+            operator = event.target.value;
+            displayContent(firstNumber);
+        }
+        
+    } else if (event.target.value === "sign") {
+        (!operator)
+            ? firstNumber = changeSign(firstNumber)
+            : secondNumber = changeSign(secondNumber)
 
-const oneBtn = document.querySelector("#one");
-const twoBtn = document.querySelector("#two");
-const threeBtn = document.querySelector("#three");
-const fourBtn = document.querySelector("#four");
-const fiveBtn = document.querySelector("#five");
-const sixBtn = document.querySelector("#six");
-const sevenBtn = document.querySelector("#seven");
-const eightBtn = document.querySelector("#eight");
-const nineBtn = document.querySelector("#nine");
-const zeroBtn = document.querySelector("#zero");
-const equalBtn = document.querySelector("#equal");
-const addBtn = document.querySelector("#add");
-const minusBtn = document.querySelector("#minus");
-const multiplyBtn = document.querySelector("#multiply");
-const divideBtn = document.querySelector("#divide");
-const clearBtn = document.querySelector("#clear");
+    } else if (event.target.value === "percent") {
+        (!operator)
+            ? firstNumber = convertToPercentage(firstNumber)
+            : secondNumber = convertToPercentage(secondNumber)
 
-const mainDisplay = document.querySelector("#main");
-const secondaryDisplay = document.querySelector("#secondary");
+    } else if (event.target.classList.contains("btn-equals")) {
+        (firstNumber && operator && secondNumber)
+            ? displayContent(operate(firstNumber, secondNumber, operator))
+            : null
 
-//Values Container
+    } else if (event.target.value === "clear") {
+        clear();
+    }
+});
 
-let values = {
-    operandOne: null,
-    operandTwo: null,
-    operator: null,
-};
-
-let mainDisplayText = "";
-let secondaryDisplayText = "";
-
-//Buttons
-
-oneBtn.addEventListener('click', updateMainDisplay);
-twoBtn.addEventListener('click', updateMainDisplay);
-threeBtn.addEventListener('click', updateMainDisplay);
-fourBtn.addEventListener('click', updateMainDisplay);
-fiveBtn.addEventListener('click', updateMainDisplay);
-sixBtn.addEventListener('click', updateMainDisplay);
-sevenBtn.addEventListener('click', updateMainDisplay);
-eightBtn.addEventListener('click', updateMainDisplay);
-nineBtn.addEventListener('click', updateMainDisplay);
-addBtn.addEventListener('click', assignOperator);
-clearBtn.addEventListener('click', clearAll);
-
-//Functions
-
-const strToNum = {one: 1,  two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9};
-const wordToNumber = word => Number(strToNum[word.toLowerCase()]);
-
-const btnToSymbol = {add: "+",  minus: "-", multiply: "*", divide: "/"};
-const oprtToSymbol = word => btnToSymbol[word.toLowerCase()];
-
-function updateMainDisplay(event) {
-    let input = event.target.id;
-    input = wordToNumber(input);
-    mainDisplayText = mainDisplayText + input.toString();
-    mainDisplay.textContent = mainDisplayText;
+function displayContent (content) {
+    let length = content.toString().length;
+    if (length <= 6) {
+        display.style.fontSize = "75px";
+    } else if (length > 6 && length <= 8) {
+        display.style.fontSize = "60px";
+    } else if (length > 8 && length <= 10) {
+        display.style.fontSize = "40px";
+    } else {
+        display.style.fontSize = "28px";
+    }
+    display.textContent = content;
 }
 
-function clearAll() {
-    mainDisplayText = "0";
-    mainDisplay.textContent = mainDisplayText;
-    secondaryDisplayText = "";
-    secondaryDisplay.textContent = secondaryDisplayText;
-    values.operandOne = null;
-    values.operandTwo = null;
-    values.operator = null;
+function setNumber (number, numberClick) {
+    if (number == "0") {
+        number = numberClick
+    } else {
+        (number.toString().length <= 7)
+            ? number = number + numberClick
+            : null;
+    }
+    displayContent(number);
+    return number;
 }
 
-function assignOperator(event) {
-    let input = event.target.id;
-    input = oprtToSymbol(input);
-    values.operator = input.toString();
-    values.operandOne = mainDisplayText;
-    secondaryDisplayText = mainDisplayText
-    secondaryDisplay.textContent = secondaryDisplayText;
-    mainDisplay.textContent = "0";
-    mainDisplayText = "";
-    console.log(values.operandOne);
-    console.log(values.operator);
+function addDecimal (number) {
+    (!number) ? number = 0 + "." : number = number + "."
+    displayContent(number);
+    return number;
+}
+
+function changeSign (number) {
+    if (number != 0) {
+        number = -number;
+        displayContent(number);
+        return number;
+    } else {
+        number = 0;
+        displayContent(number);
+        return number;
+    }
+}
+
+function convertToPercentage (number) {
+    if (number != 0) {
+        number = number / 100;
+        displayContent(number);
+        return number;
+    } else {
+        number = 0;
+        displayContent(number);
+        return number;
+    }
+}
+
+function reset() {
+    firstNumber = "";
+    secondNumber = "";
+}
+
+function clear() {
+    firstNumber = "";
+    secondNumber = "";
+    operator = "";
+    displayContent("0");
+}
+
+function operate (num1, num2, operator) {
+    switch (operator) {
+        case("+"):
+        firstNumber = Number(num1) + Number(num2);
+        secondNumber = "";
+        return firstNumber;
+
+        case("-"):
+        firstNumber = num1 - num2;
+        secondNumber = "";
+        return firstNumber;
+        
+        case("*"):
+        firstNumber = num1 * num2;
+        secondNumber = "";
+        return firstNumber;
+
+        case("/"):
+        firstNumber = num1 / num2;
+        secondNumber = "";
+        return firstNumber;
+    }
 }
